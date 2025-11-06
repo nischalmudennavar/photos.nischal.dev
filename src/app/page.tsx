@@ -10,35 +10,39 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Home() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+useGSAP(
+  () => {
+    if (!scrollRef.current || !containerRef.current) return;
 
-  useGSAP(
-    () => {
-      if (!scrollRef.current || !containerRef.current) return;
+    const scrollContainer = scrollRef.current;
+    const totalScrollWidth = scrollContainer.scrollWidth / 3;
 
-      const scrollContainer = scrollRef.current;
-      const images = scrollContainer.querySelectorAll("img");
-      const totalWidth = scrollContainer.scrollWidth / 3; // Divide by 3 because we have 3 sets
+    let currentScroll = 0;
 
-      // Horizontal scroll animation tied to vertical scroll
-      gsap.to(scrollContainer, {
-        scrollLeft: totalWidth,
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1,
-          onUpdate: (self) => {
-            // Loop the scroll position for infinite effect
-            const progress = self.progress;
-            scrollContainer.scrollLeft = (progress * totalWidth) % totalWidth;
-          },
+    // Proxy tween object
+    const proxy = { scroll: 0 };
+
+    const tween = gsap.to(proxy, {
+      scroll: totalScrollWidth,
+      ease: "none",
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1,
+        onUpdate: () => {
+          currentScroll = proxy.scroll % totalScrollWidth;
+          scrollContainer.scrollLeft = currentScroll;
         },
-      });
-    },
-    { scope: containerRef }
-  );
+      },
+    });
 
+    return () => {
+      tween.kill();
+    };
+  },
+  { scope: containerRef }
+);
   const images = [
     {
       src: "https://images.pexels.com/photos/33814183/pexels-photo-33814183.jpeg",
@@ -51,6 +55,10 @@ export default function Home() {
     {
       src: "https://images.pexels.com/photos/16152930/pexels-photo-16152930.jpeg",
       alt: "Nature scene",
+    },
+    {
+      src: "https://images.pexels.com/photos/34087127/pexels-photo-34087127.jpeg",
+      alt: "Office Space",
     },
   ];
 
@@ -73,7 +81,7 @@ export default function Home() {
         {/* Image Slider */}
         <div
           ref={scrollRef}
-          className="h-3/4 w-full flex gap-20 mb-4 overflow-x-scroll whitespace-nowrap hide-scrollbar"
+          className="h-3/4 w-full flex gap-2 mb-4 overflow-x-scroll whitespace-nowrap hide-scrollbar"
         >
           {/* Triple the images for infinite loop */}
           {[...images, ...images, ...images].map((image, index) => (

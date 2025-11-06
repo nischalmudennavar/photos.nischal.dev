@@ -17,7 +17,7 @@ const geistMono = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "photos.nischal.dev",
+  title: "Photos by Nischal Mudennavar",
   description: "A minimalist photo gallery by Nischal Mudennavar;",
 };
 
